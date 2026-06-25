@@ -4,6 +4,7 @@ __pycache__/
 config.json
 build/
 dist/
+release/
 *.spec
 !Donna.spec
 .DS_Store
