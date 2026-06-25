@@ -1,0 +1,5 @@
+flask>=3.0
+pywebview>=6.0
+pyinstaller>=6.0
+higgsfield-client>=0.1
+Pillow>=10.0

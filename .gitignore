@@ -1,0 +1,9 @@
+venv/
+__pycache__/
+*.pyc
+config.json
+build/
+dist/
+*.spec
+!Donna.spec
+.DS_Store
