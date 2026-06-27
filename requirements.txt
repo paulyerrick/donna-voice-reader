@@ -1,5 +1,12 @@
 flask>=3.0
 pywebview>=6.0
 pyinstaller>=6.0
-higgsfield-client>=0.1
 Pillow>=10.0
+kokoro>=0.9.4,<0.10
+soundfile>=0.12
+misaki[en]>=0.9.4
+numpy>=1.26,<2
+torch>=2.2,<2.3
+transformers>=4.40,<5
+huggingface-hub>=0.23
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl

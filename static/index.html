@@ -8,25 +8,133 @@
 <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;1,8..60,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;1,8..60,400&display=swap" rel="stylesheet">
 <style>
   body { font-family: 'Inter', system-ui, sans-serif; }
   .reader-text {
     font-family: 'Source Serif 4', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
-    font-size: 1.2rem;
-    line-height: 1.85;
-    letter-spacing: 0.015em;
+    font-size: 1.125rem;
+    line-height: 1.65;
+    letter-spacing: 0.012em;
     font-weight: 400;
-    color: #f1f5f9;
+    color: rgba(241, 245, 249, 0.92);
   }
   .reader-text::placeholder {
     font-family: 'Source Serif 4', Georgia, serif;
     font-style: italic;
-    color: #64748b;
+    color: rgba(148, 163, 184, 0.75);
     opacity: 1;
   }
+  :root {
+    --bubble-radius-target: 16px;
+    --theme-accent1: #ff00aa;
+    --theme-accent2: #00e5ff;
+    --theme-accent1-rgb: 255, 0, 170;
+    --theme-accent2-rgb: 0, 229, 255;
+    --theme-body-bg: #070709;
+    --theme-vignette-rgb: 7, 7, 9;
+    --theme-gradient-accent: linear-gradient(135deg, var(--theme-accent1), var(--theme-accent2));
+    --theme-gradient-border: linear-gradient(140deg, rgba(var(--theme-accent1-rgb), 0.22), rgba(var(--theme-accent2-rgb), 0.16), rgba(255, 255, 255, 0.04));
+    --theme-gradient-border-strong: linear-gradient(140deg, rgba(var(--theme-accent1-rgb), 0.35), rgba(var(--theme-accent2-rgb), 0.25), rgba(255, 255, 255, 0.05));
+    --theme-play-glow: rgba(var(--theme-accent1-rgb), 0.4);
+    --ease-soft: cubic-bezier(0.33, 1, 0.68, 1);
+  }
+  .glass-bubble-shell {
+    background: var(--theme-gradient-border);
+    padding: 1px;
+    border-radius: var(--bubble-radius-target);
+    transition: border-radius 0.32s cubic-bezier(0.33, 1, 0.68, 1);
+  }
+  .glass-bubble {
+    position: relative;
+    overflow: hidden;
+    border-radius: calc(var(--bubble-radius-target) - 1px);
+    background: rgba(255, 255, 255, 0.035);
+    backdrop-filter: blur(28px) saturate(1.35);
+    -webkit-backdrop-filter: blur(28px) saturate(1.35);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.04),
+      0 8px 32px rgba(0, 0, 0, 0.18);
+    transition: border-radius 0.32s cubic-bezier(0.33, 1, 0.68, 1);
+  }
+  .glass-bubble::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(145deg, rgba(255,255,255,0.22), rgba(255,255,255,0.03) 40%, rgba(255,255,255,0.08) 60%, rgba(255,255,255,0.02));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  .glass-bubble::after {
+    content: '';
+    position: absolute;
+    inset: -20%;
+    border-radius: inherit;
+    background:
+      radial-gradient(ellipse 80% 50% at 10% 0%, rgba(255,255,255,0.12), transparent 55%),
+      radial-gradient(ellipse 60% 40% at 95% 100%, rgba(0,229,255,0.08), transparent 50%);
+    filter: url(#glass-edge-distort);
+    opacity: 0.55;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    transition: opacity 0.28s ease;
+  }
+  .glass-bubble.is-expanding::after {
+    opacity: 0;
+    filter: none;
+  }
+  .glass-bubble-content {
+    position: relative;
+    z-index: 1;
+  }
+  .glass-bubble-content--compact {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: rgba(203, 213, 225, 1);
+  }
+  .glass-bubble-shell.inline-flex .glass-bubble {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.04),
+      0 4px 16px rgba(0, 0, 0, 0.14);
+  }
+  .text-bubble-inner {
+    display: flex;
+    align-items: flex-start;
+    padding: 0.65rem 1rem 0.65rem 1.25rem;
+  }
+  .text-bubble-inner textarea {
+    flex: 1;
+    display: block;
+    min-height: 1.65rem;
+    max-height: 20rem;
+    resize: none;
+    overflow-y: hidden;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    transition: height 0.32s cubic-bezier(0.33, 1, 0.68, 1);
+  }
+  .text-bubble-footer {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 0.65rem 0.55rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+  }
   .modal-overlay {
-    display: none;
+    display: flex;
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.65);
@@ -34,10 +142,38 @@
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.32s var(--ease-soft),
+      visibility 0s linear 0.32s,
+      backdrop-filter 0.32s var(--ease-soft);
   }
-  .modal-overlay.visible { display: flex; }
+  .modal-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition:
+      opacity 0.32s var(--ease-soft),
+      visibility 0s,
+      backdrop-filter 0.32s var(--ease-soft);
+  }
+  .modal-panel {
+    transform: scale(0.97) translateY(10px);
+    opacity: 0;
+    transition:
+      transform 0.32s var(--ease-soft),
+      opacity 0.28s var(--ease-soft);
+    will-change: transform, opacity;
+  }
+  .modal-overlay.visible .modal-panel {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
   .gradient-border-shell {
-    background: linear-gradient(140deg, rgba(255,0,170,0.35), rgba(0,229,255,0.25), rgba(255,255,255,0.05));
+    background: var(--theme-gradient-border-strong);
     padding: 1px;
     border-radius: 1.5rem;
   }
@@ -48,14 +184,14 @@
     border-radius: calc(1.5rem - 1px);
   }
   .play-btn-glow {
-    box-shadow: 0 0 40px -8px rgba(255, 0, 170, 0.4);
+    box-shadow: 0 0 40px -8px var(--theme-play-glow);
   }
   .play-btn-glow.loading {
     animation: pulse-glow 1.2s ease-in-out infinite;
   }
   @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 40px -8px rgba(255, 0, 170, 0.4); }
-    50% { box-shadow: 0 0 50px -4px rgba(255, 0, 170, 0.6); }
+    0%, 100% { box-shadow: 0 0 40px -8px var(--theme-play-glow); }
+    50% { box-shadow: 0 0 50px -4px var(--theme-play-glow); }
   }
   .error-banner {
     display: none;
@@ -69,18 +205,50 @@
   }
   .error-banner.visible { display: block; }
   #audioElement { display: none; }
+  .settings-header-reactive {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    flex-shrink: 0;
+  }
+  .settings-header-reactive-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(203, 213, 225, 1);
+    white-space: nowrap;
+  }
+  .settings-select-wrap {
+    background: var(--theme-gradient-border);
+    padding: 1px;
+    border-radius: 10px;
+    transition: background 0.2s var(--ease-soft);
+  }
+  .settings-select-wrap:focus-within {
+    background: var(--theme-gradient-border-strong);
+  }
   .settings-select {
     width: 100%;
-    padding: 10px 12px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.03);
+    padding: 10px 2.25rem 10px 12px;
+    border-radius: 9px;
+    border: none;
+    background-color: rgba(10, 10, 14, 0.92);
+    background-image:
+      linear-gradient(140deg, rgba(var(--theme-accent1-rgb), 0.07), rgba(var(--theme-accent2-rgb), 0.05), rgba(255, 255, 255, 0.02)),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M7 10l5 5 5-5' stroke='%2394a3b8' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat, no-repeat;
+    background-position: 0 0, right 0.65rem center;
+    background-size: auto, 16px;
     color: #e2e8f0;
     font-size: 14px;
     outline: none;
     cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    transition: box-shadow 0.2s var(--ease-soft);
   }
-  .settings-select:focus { border-color: rgba(255, 0, 170, 0.4); }
+  .settings-select:focus {
+    box-shadow: inset 0 0 0 1px rgba(var(--theme-accent1-rgb), 0.35);
+  }
   .settings-select option { background: #14141a; color: #e2e8f0; }
   .app-nav {
     position: fixed;
@@ -102,16 +270,182 @@
   .app-nav-actions {
     flex: 0 0 auto;
   }
+  .settings-tab-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    padding: 4px;
+    margin-bottom: 1.25rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .settings-tab-btn {
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: rgba(148, 163, 184, 1);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s var(--ease-soft), background 0.2s var(--ease-soft);
+  }
+  .settings-tab-btn:hover { color: #fff; }
+  .settings-tab-btn.active {
+    color: #fff;
+    background: rgba(var(--theme-accent1-rgb), 0.12);
+  }
+  .settings-panels {
+    display: grid;
+    min-height: 280px;
+    margin-bottom: 1.5rem;
+  }
+  .settings-tab-panel {
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+    transition:
+      opacity 0.32s var(--ease-soft),
+      transform 0.32s var(--ease-soft);
+  }
+  .settings-tab-panel.is-active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .settings-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+  }
+  .settings-field-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(203, 213, 225, 1);
+  }
+  .settings-field-label a {
+    font-size: 11px;
+    color: rgba(255, 0, 170, 0.85);
+    text-decoration: none;
+  }
+  .settings-field-label a:hover { color: rgba(255, 0, 170, 1); }
+  .settings-provider-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  .settings-provider-grid .provider-option {
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+  }
+  .provider-option.active {
+    border-color: rgba(var(--theme-accent1-rgb), 0.35) !important;
+    background: rgba(var(--theme-accent1-rgb), 0.08) !important;
+    color: #fff !important;
+  }
+  .scheme-option {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.03);
+    cursor: pointer; transition: border-color 0.2s, background 0.2s;
+    text-align: left; width: 100%;
+  }
+  .scheme-option:hover { border-color: rgba(255,255,255,0.16); }
+  .scheme-option.active {
+    border-color: rgba(var(--theme-accent1-rgb), 0.35);
+    background: rgba(var(--theme-accent1-rgb), 0.08);
+  }
+  .scheme-swatch {
+    width: 28px; height: 28px; border-radius: 9999px; flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+  .settings-toggle {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .settings-toggle input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .settings-toggle-track {
+    width: 44px;
+    height: 24px;
+    border-radius: 9999px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.10);
+    transition: background 0.2s, border-color 0.2s;
+    position: relative;
+  }
+  .settings-toggle input:checked + .settings-toggle-track {
+    background: rgba(var(--theme-accent1-rgb), 0.35);
+    border-color: rgba(var(--theme-accent1-rgb), 0.45);
+  }
+  .settings-toggle-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 9999px;
+    background: #94a3b8;
+    transition: transform 0.2s, background 0.2s;
+  }
+  .settings-toggle input:checked + .settings-toggle-track .settings-toggle-thumb {
+    transform: translateX(20px);
+    background: #fff;
+  }
 </style>
 </head>
-<body class="bg-[#070709] text-slate-200 antialiased overflow-x-hidden min-h-screen selection:bg-fuchsia-500/30 selection:text-white">
+<body class="text-slate-200 antialiased overflow-x-hidden min-h-screen selection:bg-fuchsia-500/30 selection:text-white">
 
-<div id="fluid-container" class="fixed inset-0 z-0 opacity-90 pointer-events-none mix-blend-screen"></div>
-<div class="fixed inset-0 z-0 pointer-events-none" style="background: radial-gradient(circle at center, transparent 0%, #070709 75%);"></div>
+<svg width="0" height="0" aria-hidden="true" style="position:absolute">
+  <defs>
+    <filter id="glass-edge-distort" x="-15%" y="-15%" width="130%" height="130%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.018" numOctaves="2" seed="8" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="6" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+</svg>
+
+<!-- WebGL Fluid Background (Voxa/AERIS-style FBM domain-warped noise) -->
+<div id="fluid-container" class="fixed inset-0 z-0 pointer-events-none">
+  <canvas id="fluid-canvas" class="w-full h-full block"></canvas>
+</div>
+
+<!-- Ambient Vignette -->
+<div id="theme-vignette" class="fixed inset-0 z-[1] pointer-events-none" style="background: radial-gradient(circle at 50% 50%, transparent 0%, rgba(7,7,9,0.85) 100%);"></div>
+
+<!-- Procedural Noise Overlay for Texture -->
+<div class="fixed inset-0 z-[2] pointer-events-none opacity-[0.03]" style="background-image: url(&quot;data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E&quot;); background-size: 128px 128px;"></div>
 
 <nav class="app-nav">
   <div class="app-nav-brand flex items-center gap-2 font-medium text-white">
-    <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background: linear-gradient(135deg, #ff00aa, #00e5ff);">
+    <div id="nav-logo" class="w-7 h-7 rounded-lg flex items-center justify-center" style="background: var(--theme-gradient-accent);">
       <iconify-icon icon="solar:soundwave-linear" width="16" class="text-white"></iconify-icon>
     </div>
     <span class="tracking-tight">Donna</span>
@@ -125,22 +459,25 @@
 
 <main class="relative z-10 min-h-screen flex flex-col items-center justify-center px-5 pt-[4.5rem] pb-16 gap-6">
 
-  <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 text-xs font-medium text-slate-300" style="background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0) 100%); backdrop-filter: blur(8px);">
-    <span id="status-dot" class="w-1.5 h-1.5 rounded-full bg-slate-500 transition-colors"></span>
-    <span id="status-label">Ready to read</span>
+  <div id="statusBubbleShell" class="glass-bubble-shell inline-flex">
+    <div class="glass-bubble">
+      <div class="glass-bubble-content glass-bubble-content--compact">
+        <span id="status-dot" class="w-1.5 h-1.5 rounded-full bg-slate-500 transition-colors"></span>
+        <span id="status-label">Ready to read</span>
+      </div>
+    </div>
   </div>
 
-  <div class="w-full max-w-2xl gradient-border-shell">
-    <div class="glass-surface p-1.5">
-      <div class="relative rounded-2xl overflow-hidden">
-        <textarea id="textInput" rows="8"
+  <div id="textBubbleShell" class="w-full max-w-2xl glass-bubble-shell">
+    <div class="glass-bubble">
+      <div class="text-bubble-inner glass-bubble-content">
+        <textarea id="textInput" rows="1"
           placeholder="Paste or type the text you'd like read aloud…"
-          class="reader-text w-full max-h-80 min-h-[180px] resize-none bg-transparent px-5 py-4 outline-none overflow-y-auto"
-          spellcheck="false"
-          style="white-space: pre-wrap; word-wrap: break-word;"></textarea>
+          class="reader-text w-full bg-transparent outline-none border-0"
+          spellcheck="false"></textarea>
       </div>
-      <div class="flex items-center justify-end px-3 pb-2 pt-2 border-t border-white/[0.06]">
-        <button id="clear-btn" class="px-3 py-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] text-slate-300 text-xs font-medium transition-colors flex items-center gap-1.5">
+      <div class="text-bubble-footer">
+        <button id="clear-btn" class="px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 text-xs font-medium transition-colors flex items-center gap-1.5">
           <iconify-icon icon="solar:eraser-linear" width="14"></iconify-icon>
           Clear
         </button>
@@ -155,7 +492,7 @@
       <button id="rewind-btn" class="w-10 h-10 rounded-full border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] transition-colors flex items-center justify-center text-slate-300" title="Back 10s">
         <iconify-icon icon="solar:rewind-back-linear" width="18"></iconify-icon>
       </button>
-      <div id="play-wrap" style="background: linear-gradient(135deg, #ff00aa, #00e5ff); padding: 2px; border-radius: 9999px;" class="play-btn-glow">
+      <div id="play-wrap" style="background: var(--theme-gradient-accent); padding: 2px; border-radius: 9999px;" class="play-btn-glow">
         <button id="play-btn" class="w-14 h-14 rounded-full bg-[#0c0c10] hover:bg-[#14141a] transition-colors flex items-center justify-center text-white disabled:opacity-50">
           <iconify-icon id="play-icon" icon="solar:play-bold" width="24"></iconify-icon>
         </button>
@@ -169,57 +506,86 @@
 
 <audio id="audioElement" crossorigin="anonymous"></audio>
 
-<div class="modal-overlay" id="settingsModal">
-  <div class="w-full max-w-md mx-4 gradient-border-shell">
-    <div class="glass-surface p-6 max-h-[90vh] overflow-y-auto">
-      <h2 class="text-lg font-semibold text-white mb-1">Settings</h2>
-      <p class="text-sm text-slate-400 mb-5">Choose your provider, voice, and API keys.</p>
-
-      <div class="space-y-4 mb-6">
-        <div>
-          <label class="block text-xs font-medium text-slate-300 mb-2">Provider</label>
-          <div class="flex flex-wrap gap-2" id="settings-provider-group">
-            <button type="button" class="provider-option px-3 py-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] text-slate-400 text-xs font-medium transition-colors hover:text-white" data-provider="openai" onclick="selectSettingsProvider('openai')">
-              OpenAI <span id="dot-openai" class="ml-1 inline-block w-1.5 h-1.5 rounded-full bg-slate-600"></span>
-            </button>
-            <button type="button" class="provider-option px-3 py-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] text-slate-400 text-xs font-medium transition-colors hover:text-white" data-provider="elevenlabs" onclick="selectSettingsProvider('elevenlabs')">
-              ElevenLabs <span id="dot-elevenlabs" class="ml-1 inline-block w-1.5 h-1.5 rounded-full bg-slate-600"></span>
-            </button>
-            <button type="button" class="provider-option px-3 py-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] text-slate-400 text-xs font-medium transition-colors hover:text-white" data-provider="cartesia" onclick="selectSettingsProvider('cartesia')">
-              Cartesia <span id="dot-cartesia" class="ml-1 inline-block w-1.5 h-1.5 rounded-full bg-slate-600"></span>
-            </button>
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1.5" for="settings-voice">Voice</label>
-          <select id="settings-voice" class="settings-select"></select>
-        </div>
-
-        <div class="border-t border-white/[0.06] pt-4">
-          <label class="block text-xs font-medium text-slate-300 mb-1.5">
-            OpenAI API Key
-            <a href="https://platform.openai.com/api-keys" target="_blank" class="text-fuchsia-400 hover:text-fuchsia-300 float-right text-[11px]">Get key →</a>
+<div class="modal-overlay" id="settingsModal" aria-hidden="true">
+  <div class="modal-panel w-full max-w-md mx-4 gradient-border-shell">
+    <div class="glass-surface p-6 max-h-[90vh] overflow-y-auto flex flex-col">
+      <div class="settings-header">
+        <h2 class="text-lg font-semibold text-white">Settings</h2>
+        <div class="settings-header-reactive">
+          <span class="settings-header-reactive-label">Reactive Background</span>
+          <label class="settings-toggle" title="Reactive Background">
+            <input type="checkbox" id="settings-fluid-reactive" checked>
+            <span class="settings-toggle-track"><span class="settings-toggle-thumb"></span></span>
           </label>
-          <input type="password" id="key-openai" placeholder="sk-..." class="w-full px-3 py-2.5 rounded-lg border border-white/[0.08] bg-white/[0.03] text-slate-100 text-sm outline-none focus:border-fuchsia-500/40 transition-colors font-mono">
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1.5">
-            ElevenLabs API Key
-            <a href="https://elevenlabs.io/app/settings/api-keys" target="_blank" class="text-fuchsia-400 hover:text-fuchsia-300 float-right text-[11px]">Get key →</a>
-          </label>
-          <input type="password" id="key-elevenlabs" placeholder="..." class="w-full px-3 py-2.5 rounded-lg border border-white/[0.08] bg-white/[0.03] text-slate-100 text-sm outline-none focus:border-fuchsia-500/40 transition-colors font-mono">
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1.5">
-            Cartesia API Key
-            <a href="https://play.cartesia.ai/getting-started" target="_blank" class="text-fuchsia-400 hover:text-fuchsia-300 float-right text-[11px]">Get key →</a>
-          </label>
-          <input type="password" id="key-cartesia" placeholder="..." class="w-full px-3 py-2.5 rounded-lg border border-white/[0.08] bg-white/[0.03] text-slate-100 text-sm outline-none focus:border-fuchsia-500/40 transition-colors font-mono">
         </div>
       </div>
 
-      <div class="flex gap-3 justify-end">
+      <div class="settings-tab-bar" role="tablist">
+        <button type="button" class="settings-tab-btn active" data-tab="voices" onclick="selectSettingsTab('voices')">Voices</button>
+        <button type="button" class="settings-tab-btn" data-tab="theme" onclick="selectSettingsTab('theme')">Theme</button>
+        <button type="button" class="settings-tab-btn" data-tab="provider" onclick="selectSettingsTab('provider')">Provider</button>
+      </div>
+
+      <div class="settings-panels">
+        <div class="settings-tab-panel is-active" data-tab="voices" role="tabpanel">
+          <div class="settings-field">
+            <span class="settings-field-label">Provider</span>
+            <div class="settings-provider-grid" id="settings-provider-group">
+              <button type="button" class="provider-option px-3 py-2 rounded-lg border border-white/[0.08] bg-white/[0.03] text-slate-400 text-xs font-medium transition-colors hover:text-white flex items-center gap-1" data-provider="local" onclick="selectSettingsProvider('local')">
+                Local <span class="text-[10px] text-emerald-400">FREE</span>
+              </button>
+              <button type="button" class="provider-option px-3 py-2 rounded-lg border border-white/[0.08] bg-white/[0.03] text-slate-400 text-xs font-medium transition-colors hover:text-white flex items-center gap-1" data-provider="openai" onclick="selectSettingsProvider('openai')">
+                OpenAI <span id="dot-openai" class="inline-block w-1.5 h-1.5 rounded-full bg-slate-600"></span>
+              </button>
+              <button type="button" class="provider-option px-3 py-2 rounded-lg border border-white/[0.08] bg-white/[0.03] text-slate-400 text-xs font-medium transition-colors hover:text-white flex items-center gap-1" data-provider="elevenlabs" onclick="selectSettingsProvider('elevenlabs')">
+                ElevenLabs <span id="dot-elevenlabs" class="inline-block w-1.5 h-1.5 rounded-full bg-slate-600"></span>
+              </button>
+              <button type="button" class="provider-option px-3 py-2 rounded-lg border border-white/[0.08] bg-white/[0.03] text-slate-400 text-xs font-medium transition-colors hover:text-white flex items-center gap-1" data-provider="cartesia" onclick="selectSettingsProvider('cartesia')">
+                Cartesia <span id="dot-cartesia" class="inline-block w-1.5 h-1.5 rounded-full bg-slate-600"></span>
+              </button>
+            </div>
+          </div>
+          <div class="settings-field">
+            <label class="settings-field-label" for="settings-voice">Voice</label>
+            <div class="settings-select-wrap">
+              <select id="settings-voice" class="settings-select"></select>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-tab-panel" data-tab="theme" role="tabpanel">
+          <div class="settings-field">
+            <span class="settings-field-label">Background</span>
+            <div id="settings-scheme-grid" class="grid grid-cols-1 gap-2"></div>
+          </div>
+        </div>
+
+        <div class="settings-tab-panel" data-tab="provider" role="tabpanel">
+          <div class="settings-field">
+            <label class="settings-field-label" for="key-openai">
+              OpenAI
+              <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">Get key →</a>
+            </label>
+            <input type="password" id="key-openai" placeholder="sk-..." class="w-full px-3 py-2.5 rounded-lg border border-white/[0.08] bg-white/[0.03] text-slate-100 text-sm outline-none focus:border-fuchsia-500/40 transition-colors font-mono">
+          </div>
+          <div class="settings-field">
+            <label class="settings-field-label" for="key-elevenlabs">
+              ElevenLabs
+              <a href="https://elevenlabs.io/app/settings/api-keys" target="_blank" rel="noopener">Get key →</a>
+            </label>
+            <input type="password" id="key-elevenlabs" placeholder="..." class="w-full px-3 py-2.5 rounded-lg border border-white/[0.08] bg-white/[0.03] text-slate-100 text-sm outline-none focus:border-fuchsia-500/40 transition-colors font-mono">
+          </div>
+          <div class="settings-field">
+            <label class="settings-field-label" for="key-cartesia">
+              Cartesia
+              <a href="https://play.cartesia.ai" target="_blank" rel="noopener">Get key →</a>
+            </label>
+            <input type="password" id="key-cartesia" placeholder="..." class="w-full px-3 py-2.5 rounded-lg border border-white/[0.08] bg-white/[0.03] text-slate-100 text-sm outline-none focus:border-fuchsia-500/40 transition-colors font-mono">
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-3 justify-end shrink-0">
         <button onclick="closeSettings()" class="px-4 py-2 rounded-lg border border-white/[0.08] text-slate-300 text-sm hover:bg-white/[0.04] transition-colors">Cancel</button>
         <button onclick="saveSettings()" class="px-4 py-2 rounded-full bg-[#070709] hover:bg-white/[0.04] text-white text-sm font-medium transition-colors border border-white/[0.08]">Save</button>
       </div>
@@ -227,489 +593,888 @@
   </div>
 </div>
 
-<script type="module">
-import { Renderer, Program, Mesh, Color, Triangle } from 'https://cdn.jsdelivr.net/npm/ogl@1.0.0/+esm';
+<script>
+(function() {
+  'use strict';
 
-const MAX_STRANDS = 12, MAX_COLORS = 8;
-const VERT = `#version 300 es
-in vec2 position;
-void main(){ gl_Position = vec4(position,0.0,1.0); }`;
-const FRAG = `#version 300 es
-precision highp float;
-uniform float uTime; uniform vec2 uResolution;
-uniform vec3 uColors[${MAX_COLORS}]; uniform int uColorCount; uniform int uStrandCount;
-uniform float uSpeed,uAmplitude,uWaviness,uThickness,uGlow,uTaper,uSpread,uHueShift,uIntensity,uOpacity,uScale,uSaturation;
-out vec4 fragColor; const float PI=3.14159265;
-vec3 samplePalette(float t){ t=fract(t); float s=t*float(uColorCount); int idx=int(floor(s)); float b=fract(s); int n=idx+1; if(n>=uColorCount)n=0; return mix(uColors[idx],uColors[n],b); }
-void main(){
-  vec2 uv=(gl_FragCoord.xy-0.5*uResolution)/uResolution.y; uv/=max(uScale,0.0001);
-  float e=0.06+uIntensity*0.94;
-  float env=pow(max(cos(uv.x*PI*1.1),0.0),uTaper);
-  vec3 col=vec3(0.0);
-  for(int i=0;i<${MAX_STRANDS};i++){
-    if(i>=uStrandCount)break;
-    float fi=float(i); float ph=fi*1.7*uSpread; float freq=(1.5+fi*0.2)*uWaviness; float spd=1.0+fi*0.8;
-    float tt=uTime*uSpeed;
-    float w=sin(uv.x*freq+tt*spd+ph)*0.70+sin(uv.x*freq*1.2-tt*spd*0.6+ph*1.5)*0.30;
-    float amp=(0.1+0.05*e)*env*uAmplitude; float y=w*amp;
-    float d=abs(uv.y-y); float thick=(0.001+0.04*e)*(0.4+env)*uThickness;
-    float g=thick/(d+thick*0.5); g=g*g;
-    float h=fi/float(uStrandCount)+uv.x*0.2+uTime*0.05+uHueShift;
-    col+=samplePalette(h)*g*env;
-  }
-  col*=0.5+0.6*e; col=1.0-exp(-col*uGlow);
-  float gray=dot(col,vec3(0.2126,0.7152,0.0722)); col=max(mix(vec3(gray),col,uSaturation),0.0);
-  float lum=max(max(col.r,col.g),col.b); float alpha=clamp(lum,0.0,1.0)*uOpacity;
-  fragColor=vec4(col*uOpacity,alpha);
-}`;
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // WEBGL FLUID SHADER — Voxa/AERIS-style domain-warped FBM noise
+  // Adapted to Donna's magenta + cyan palette with audio-reactive color blending
+  // ═══════════════════════════════════════════════════════════════════════════════
 
-const buildPalette = (arr) => {
-  const p = [];
-  for (let i = 0; i < MAX_COLORS; i++) {
-    const hex = arr[i] ?? arr[arr.length - 1];
-    const c = new Color(hex);
-    p.push([c.r, c.g, c.b]);
-  }
-  return p;
-};
+  const canvas = document.getElementById('fluid-canvas');
+  const gl = canvas.getContext('webgl', { alpha: false, antialias: false, powerPreference: 'high-performance' });
+  if (!gl) { console.warn('WebGL not available — fluid background disabled'); return; }
 
-let prog;
-function initWebGL() {
-  const ctn = document.getElementById('fluid-container');
-  if (!ctn) return;
-  const renderer = new Renderer({ alpha: true, premultipliedAlpha: true, antialias: true });
-  const gl = renderer.gl;
-  gl.clearColor(0, 0, 0, 0);
-  gl.enable(gl.BLEND);
-  gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-  gl.canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;display:block;';
-  ctn.appendChild(gl.canvas);
-  const geometry = new Triangle(gl);
-  const colors = ['#ff00aa', '#ffbb00', '#00e5ff'];
-  prog = new Program(gl, {
-    vertex: VERT, fragment: FRAG,
-    uniforms: {
-      uTime: { value: 0 }, uResolution: { value: [ctn.offsetWidth, ctn.offsetHeight] },
-      uColors: { value: buildPalette(colors) }, uColorCount: { value: colors.length }, uStrandCount: { value: 3 },
-      uSpeed: { value: 0.28 }, uAmplitude: { value: 1.25 }, uWaviness: { value: 0.8 }, uThickness: { value: 0.72 },
-      uGlow: { value: 2.1 }, uTaper: { value: 3.5 }, uSpread: { value: 0.6 }, uHueShift: { value: 0 },
-      uIntensity: { value: 0.42 }, uOpacity: { value: 1.0 }, uScale: { value: 1.3 }, uSaturation: { value: 1.2 }
+  const VS = `
+    attribute vec2 a_pos;
+    void main(){ gl_Position = vec4(a_pos, 0.0, 1.0); }
+  `;
+
+  // VOXA domain-warped FBM — soft fog idle, peak forms when speaking
+  const FS = `
+    precision highp float;
+    uniform vec2  u_res;
+    uniform float u_time;
+    uniform float u_active;
+    uniform float u_bass;
+    uniform float u_treble;
+    uniform float u_fog;
+    uniform vec3 u_bg;
+    uniform vec3 u_idleDark;
+    uniform vec3 u_idleSmoke;
+    uniform vec3 u_idleTintA;
+    uniform vec3 u_idleTintB;
+    uniform vec3 u_toneA;
+    uniform vec3 u_toneB;
+
+    #define NUM_OCTAVES 5
+
+    float rand(vec2 n) {
+      return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
     }
-  });
-  const mesh = new Mesh(gl, { geometry, program: prog });
+
+    float noise(vec2 p) {
+      vec2 ip = floor(p);
+      vec2 u  = fract(p);
+      u = u * u * (3.0 - 2.0 * u);
+      float res = mix(
+        mix(rand(ip), rand(ip + vec2(1.0, 0.0)), u.x),
+        mix(rand(ip + vec2(0.0, 1.0)), rand(ip + vec2(1.0, 1.0)), u.x),
+        u.y);
+      return res * res;
+    }
+
+    float fbm(vec2 x) {
+      float v = 0.0;
+      float a = 0.5;
+      vec2  shift = vec2(100.0);
+      mat2  rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.50));
+      for (int i = 0; i < NUM_OCTAVES; ++i) {
+        v += a * noise(x);
+        x = rot * x * 2.0 + shift;
+        a *= 0.5;
+      }
+      return v;
+    }
+
+    void main() {
+      vec2 uv = gl_FragCoord.xy / max(u_res.x, u_res.y);
+      vec2 centered = (gl_FragCoord.xy - 0.5 * u_res) / u_res.y;
+
+      float voice = clamp(u_active, 0.0, 1.0);
+      float t = u_time * mix(0.05, 0.18, voice);
+
+      vec2 q = vec2(0.0);
+      q.x = fbm(uv + 0.05 * t);
+      q.y = fbm(uv + vec2(1.0));
+
+      vec2 r = vec2(0.0);
+      r.x = fbm(uv + 1.0 * q + vec2(1.7, 9.2) + 0.15 * t);
+      r.y = fbm(uv + 1.0 * q + vec2(8.3, 2.8) + 0.12 * t);
+
+      float f = fbm(uv + 2.0 * r);
+
+      // Blur radius doubles when voice is active (2× prior active spread)
+      float blurR = mix(0.020, 0.060, voice);
+      float fBlur = f * mix(0.34, 0.14, voice);
+      fBlur += fbm(uv + vec2( blurR, 0.0) + 2.0 * r) * 0.145;
+      fBlur += fbm(uv + vec2(-blurR, 0.0) + 2.0 * r) * 0.145;
+      fBlur += fbm(uv + vec2(0.0,  blurR) + 2.0 * r) * 0.145;
+      fBlur += fbm(uv + vec2(0.0, -blurR) + 2.0 * r) * 0.145;
+
+      float b2 = blurR * 1.45;
+      fBlur += (
+        fbm(uv + vec2( b2, 0.0) + 2.0 * r) +
+        fbm(uv + vec2(-b2, 0.0) + 2.0 * r) +
+        fbm(uv + vec2(0.0,  b2) + 2.0 * r) +
+        fbm(uv + vec2(0.0, -b2) + 2.0 * r)
+      ) * voice * 0.144;
+
+      float bd = blurR * 0.707;
+      fBlur += (
+        fbm(uv + vec2( bd,  bd) + 2.0 * r) +
+        fbm(uv + vec2(-bd,  bd) + 2.0 * r) +
+        fbm(uv + vec2( bd, -bd) + 2.0 * r) +
+        fbm(uv + vec2(-bd, -bd) + 2.0 * r)
+      ) * voice * 0.116;
+
+      float b3 = blurR * 2.4;
+      fBlur += (
+        fbm(uv + vec2( b3, 0.0) + 2.0 * r) +
+        fbm(uv + vec2(-b3, 0.0) + 2.0 * r) +
+        fbm(uv + vec2(0.0,  b3) + 2.0 * r) +
+        fbm(uv + vec2(0.0, -b3) + 2.0 * r)
+      ) * voice * 0.088;
+
+      float toneRaw = length(q) / (length(q) + length(r) + 0.06);
+      float toneMix = smoothstep(0.32, 0.68, toneRaw);
+
+      float fieldPeak = fBlur * fBlur * (0.42 + length(q) * 0.58 + length(r) * 0.32);
+      float centerPull = 1.0 - smoothstep(0.0, 1.30, length(centered)) * 0.30;
+      fieldPeak *= centerPull;
+
+      float field = mix(fieldPeak * 0.36 + 0.20, fieldPeak, voice);
+
+      float fogWide   = smoothstep(0.0, 0.36, field);
+      float idleShape = smoothstep(0.02, 0.50, field);
+
+      vec3 idleCol = mix(u_idleDark, u_idleSmoke, idleShape);
+      idleCol = mix(idleCol, u_idleTintA, idleShape * toneMix * (0.42 + voice * 0.58));
+      idleCol = mix(idleCol, u_idleTintB, idleShape * (1.0 - toneMix) * (0.42 + voice * 0.58));
+      idleCol = mix(idleCol, mix(u_idleTintA, u_idleTintB, toneMix), fogWide * 0.12);
+
+      vec3 col = mix(u_bg, idleCol, max(idleShape * 0.65, fogWide * 0.74 * u_fog));
+
+      float swell = voice * 0.28 + u_bass * 0.22;
+      float soften = mix(1.0, 2.0, voice);
+      float core  = smoothstep(0.16 - swell * 0.14 - soften * 0.025, 0.56 - swell * 0.18 + soften * 0.07, fieldPeak);
+      float hot   = smoothstep(0.30 - swell * 0.10 - soften * 0.020, 0.72 - swell * 0.12 + soften * 0.09, fieldPeak);
+      float soft  = smoothstep(0.08 - swell * 0.08, 0.34 - swell * 0.06, fieldPeak) * 0.38;
+
+      float voiceGain = voice * 0.50;
+      vec3 toneBlend = mix(u_toneA, u_toneB, toneMix);
+
+      col = mix(col, u_toneA, max(core, soft * 0.55) * voiceGain * toneMix * clamp(fieldPeak * 2.0, 0.0, 1.0));
+      col = mix(col, u_toneB, hot * voiceGain * (1.0 - toneMix) * 0.85);
+      col += toneBlend * hot * voiceGain * u_bass * 0.05;
+
+      float shimmer = u_treble * voiceGain * hot * 0.10 * clamp(noise(uv * 9.0 + t * 2.0), 0.0, 1.0);
+      col += mix(u_toneA, u_toneB, 0.5) * shimmer;
+
+      col = (col * (2.51 * col + 0.03)) / (col * (2.43 * col + 0.59) + 0.14);
+
+      gl_FragColor = vec4(col, 1.0);
+    }
+  `;
+
+  function createShader(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+      console.error('Shader compile error:', gl.getShaderInfoLog(s));
+      gl.deleteShader(s);
+      return null;
+    }
+    return s;
+  }
+
+  const vs = createShader(gl.VERTEX_SHADER, VS);
+  const fs = createShader(gl.FRAGMENT_SHADER, FS);
+  const prog = gl.createProgram();
+  gl.attachShader(prog, vs);
+  gl.attachShader(prog, fs);
+  gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+    console.error('Program link error:', gl.getProgramInfoLog(prog));
+    return;
+  }
+  gl.useProgram(prog);
+
+  // Fullscreen quad
+  const aPos = gl.getAttribLocation(prog, 'a_pos');
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(aPos);
+  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+  const uRes    = gl.getUniformLocation(prog, 'u_res');
+  const uTime   = gl.getUniformLocation(prog, 'u_time');
+  const uActive = gl.getUniformLocation(prog, 'u_active');
+  const uBass   = gl.getUniformLocation(prog, 'u_bass');
+  const uTreble = gl.getUniformLocation(prog, 'u_treble');
+  const uFog    = gl.getUniformLocation(prog, 'u_fog');
+  const uBg     = gl.getUniformLocation(prog, 'u_bg');
+  const uIdleDark  = gl.getUniformLocation(prog, 'u_idleDark');
+  const uIdleSmoke = gl.getUniformLocation(prog, 'u_idleSmoke');
+  const uIdleTintA = gl.getUniformLocation(prog, 'u_idleTintA');
+  const uIdleTintB = gl.getUniformLocation(prog, 'u_idleTintB');
+  const uToneA  = gl.getUniformLocation(prog, 'u_toneA');
+  const uToneB  = gl.getUniformLocation(prog, 'u_toneB');
+
+  const FLUID_SCHEMES = {
+    donna: {
+      label: 'Donna',
+      swatch: 'linear-gradient(135deg, #ff00aa, #00e5ff)',
+      ui: { accent1: '#ff00aa', accent2: '#00e5ff', accent1Rgb: '255,0,170', accent2Rgb: '0,229,255', bodyBg: '#070709', vignetteRgb: '7,7,9' },
+      bg: [0.027, 0.027, 0.035],
+      idleDark: [0.024, 0.024, 0.032],
+      idleSmoke: [0.072, 0.074, 0.095],
+      idleTintA: [0.14, 0.02, 0.10],
+      idleTintB: [0.02, 0.11, 0.15],
+      toneA: [0.55, 0.0, 0.36],
+      toneB: [0.0, 0.46, 0.67],
+    },
+    ocean: {
+      label: 'Ocean Tide',
+      swatch: 'linear-gradient(135deg, #6366f1, #22d3ee)',
+      ui: { accent1: '#6366f1', accent2: '#22d3ee', accent1Rgb: '99,102,241', accent2Rgb: '34,211,238', bodyBg: '#060810', vignetteRgb: '6,8,16' },
+      bg: [0.024, 0.031, 0.063],
+      idleDark: [0.020, 0.028, 0.055],
+      idleSmoke: [0.055, 0.070, 0.095],
+      idleTintA: [0.12, 0.06, 0.28],
+      idleTintB: [0.02, 0.16, 0.20],
+      toneA: [0.28, 0.22, 0.95],
+      toneB: [0.0, 0.78, 0.92],
+    },
+    sunset: {
+      label: 'Sunset Glow',
+      swatch: 'linear-gradient(135deg, #ff4500, #9333ea)',
+      ui: { accent1: '#ff4500', accent2: '#9333ea', accent1Rgb: '255,69,0', accent2Rgb: '147,51,234', bodyBg: '#0a0706', vignetteRgb: '10,7,6' },
+      bg: [0.039, 0.027, 0.024],
+      idleDark: [0.034, 0.024, 0.022],
+      idleSmoke: [0.078, 0.055, 0.058],
+      idleTintA: [0.18, 0.05, 0.02],
+      idleTintB: [0.10, 0.03, 0.16],
+      toneA: [0.95, 0.32, 0.05],
+      toneB: [0.55, 0.15, 0.88],
+    },
+    forest: {
+      label: 'Forest Mist',
+      swatch: 'linear-gradient(135deg, #059669, #fbbf24)',
+      ui: { accent1: '#059669', accent2: '#fbbf24', accent1Rgb: '5,150,105', accent2Rgb: '251,191,36', bodyBg: '#060a08', vignetteRgb: '6,10,8' },
+      bg: [0.024, 0.035, 0.031],
+      idleDark: [0.020, 0.030, 0.026],
+      idleSmoke: [0.048, 0.068, 0.058],
+      idleTintA: [0.02, 0.14, 0.08],
+      idleTintB: [0.14, 0.10, 0.02],
+      toneA: [0.02, 0.62, 0.32],
+      toneB: [0.95, 0.72, 0.12],
+    },
+    mono: {
+      label: 'Monochrome',
+      swatch: 'linear-gradient(135deg, #666666, #e8e8ea)',
+      ui: { accent1: '#888888', accent2: '#e8e8ea', accent1Rgb: '136,136,136', accent2Rgb: '232,232,234', bodyBg: '#000000', vignetteRgb: '0,0,0' },
+      bg: [0.0, 0.0, 0.0],
+      idleDark: [0.008, 0.008, 0.009],
+      idleSmoke: [0.10, 0.10, 0.11],
+      idleTintA: [0.08, 0.08, 0.09],
+      idleTintB: [0.16, 0.16, 0.17],
+      toneA: [0.52, 0.52, 0.54],
+      toneB: [0.82, 0.82, 0.85],
+    },
+  };
+
+  let currentFluidScheme = 'donna';
+  let settingsFluidScheme = 'donna';
+  let fluidReactive = true;
+  let settingsFluidReactive = true;
+  let themeAccent1 = '#ff00aa';
+
+  function applyTheme(name) {
+    const scheme = FLUID_SCHEMES[name] || FLUID_SCHEMES.donna;
+    const ui = scheme.ui;
+    const root = document.documentElement;
+    root.style.setProperty('--theme-accent1', ui.accent1);
+    root.style.setProperty('--theme-accent2', ui.accent2);
+    root.style.setProperty('--theme-accent1-rgb', ui.accent1Rgb);
+    root.style.setProperty('--theme-accent2-rgb', ui.accent2Rgb);
+    root.style.setProperty('--theme-body-bg', ui.bodyBg);
+    root.style.setProperty('--theme-vignette-rgb', ui.vignetteRgb);
+    document.body.style.backgroundColor = ui.bodyBg;
+    document.getElementById('theme-vignette').style.background =
+      `radial-gradient(circle at 50% 50%, transparent 0%, rgba(${ui.vignetteRgb},0.85) 100%)`;
+
+    gl.uniform3fv(uBg, scheme.bg);
+    gl.uniform3fv(uIdleDark, scheme.idleDark);
+    gl.uniform3fv(uIdleSmoke, scheme.idleSmoke);
+    gl.uniform3fv(uIdleTintA, scheme.idleTintA);
+    gl.uniform3fv(uIdleTintB, scheme.idleTintB);
+    gl.uniform3fv(uToneA, scheme.toneA);
+    gl.uniform3fv(uToneB, scheme.toneB);
+    gl.uniform1f(uFog, 1.28);
+
+    themeAccent1 = ui.accent1;
+    syncSchemeUI();
+  }
+
+  function syncSchemeUI() {
+    document.querySelectorAll('.scheme-option').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.scheme === settingsFluidScheme);
+    });
+  }
+
+  function selectSettingsScheme(id) {
+    if (!FLUID_SCHEMES[id]) return;
+    settingsFluidScheme = id;
+    applyTheme(id);
+  }
+
+  function buildSchemeGrid() {
+    const grid = document.getElementById('settings-scheme-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    Object.entries(FLUID_SCHEMES).forEach(([id, scheme]) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'scheme-option';
+      btn.dataset.scheme = id;
+      btn.innerHTML = `
+        <span class="scheme-swatch" style="background:${scheme.swatch}"></span>
+        <span class="text-sm text-white font-medium">${scheme.label}</span>`;
+      btn.addEventListener('click', () => selectSettingsScheme(id));
+      grid.appendChild(btn);
+    });
+  }
+
+  buildSchemeGrid();
+  applyTheme('donna');
+
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
   function resize() {
-    const w = ctn.offsetWidth, h = ctn.offsetHeight;
-    renderer.setSize(w, h);
-    prog.uniforms.uResolution.value = [w, h];
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    canvas.width  = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    gl.viewport(0, 0, canvas.width, canvas.height);
   }
   window.addEventListener('resize', resize);
   resize();
-  function update(t) {
-    requestAnimationFrame(update);
-    prog.uniforms.uTime.value = t * 0.001;
-    renderer.render({ scene: mesh });
-  }
-  requestAnimationFrame(update);
-}
 
-// Fluid targets — driven by audio when playing (subtle: thinner, sharper, slightly brighter)
-let targetIntensity = 0.42, targetSpeed = 0.28, targetGlow = 2.1, targetSat = 1.2;
-let targetAmplitude = 1.25, targetThickness = 0.72, targetOpacity = 1.0;
-let audioLevel = 0;
-let audioCtx = null;
-let analyser = null;
-let audioSourceConnected = false;
-let freqData = new Uint8Array(0);
+  let startTime = performance.now();
+  let currentActive = 0.0;
+  let currentBass = 0.0;
+  let currentTreble = 0.0;
+  let audioActiveTarget = 0.0;
+  let audioBassTarget = 0.0;
+  let audioTrebleTarget = 0.0;
 
-function ensureAudioGraph() {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 512;
-    analyser.smoothingTimeConstant = 0.82;
-    freqData = new Uint8Array(analyser.frequencyBinCount);
-  }
-  if (!audioSourceConnected) {
-    const source = audioCtx.createMediaElementSource(audio);
-    source.connect(analyser);
-    analyser.connect(audioCtx.destination);
-    audioSourceConnected = true;
-  }
-}
+  function render(now) {
+    requestAnimationFrame(render);
+    const elapsed = (now - startTime) * 0.001;
 
-function sampleAudioLevel() {
-  if (!analyser || audio.paused || audio.ended) return 0;
-  analyser.getByteFrequencyData(freqData);
-  let sum = 0;
-  const bins = Math.min(32, freqData.length);
-  for (let i = 0; i < bins; i++) sum += freqData[i];
-  const avg = sum / (bins * 255);
-  const wave = new Uint8Array(analyser.fftSize);
-  analyser.getByteTimeDomainData(wave);
-  let peak = 0;
-  for (let i = 0; i < wave.length; i++) {
-    const v = Math.abs(wave[i] - 128) / 128;
-    if (v > peak) peak = v;
-  }
-  return Math.min(1, avg * 0.75 + peak * 0.12);
-}
+    // Smoothly interpolate state values for fluid color transitions
+    currentActive += (audioActiveTarget - currentActive) * 0.05;
+    currentBass   += (audioBassTarget   - currentBass)   * 0.25;
+    currentTreble += (audioTrebleTarget - currentTreble) * 0.30;
 
-function tweenFluid() {
-  if (!prog) {
+    gl.uniform2f(uRes, canvas.width, canvas.height);
+    gl.uniform1f(uTime, elapsed);
+    gl.uniform1f(uActive, currentActive);
+    gl.uniform1f(uBass, currentBass);
+    gl.uniform1f(uTreble, currentTreble);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+  requestAnimationFrame(render);
+
+  // Expose setters for the audio pipeline
+  window.__fluidSetActive = function(v) { audioActiveTarget = v; };
+  window.__fluidSetBass   = function(v) { audioBassTarget = v; };
+  window.__fluidSetTreble = function(v) { audioTrebleTarget = v; };
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // AUDIO PIPELINE — analyser feeds the fluid shader's active/bass/treble uniforms
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  let audioCtx = null;
+  let analyser = null;
+  let audioSourceConnected = false;
+  let freqData = new Uint8Array(0);
+  let waveData = new Uint8Array(0);
+
+  const audio = document.getElementById('audioElement');
+
+  function ensureAudioGraph() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 1024;
+      analyser.smoothingTimeConstant = 0.6;
+      freqData = new Uint8Array(analyser.frequencyBinCount);
+      waveData = new Uint8Array(analyser.fftSize);
+    }
+    if (!audioSourceConnected && audio.src) {
+      try {
+        const source = audioCtx.createMediaElementSource(audio);
+        source.connect(analyser);
+        analyser.connect(audioCtx.destination);
+        audioSourceConnected = true;
+      } catch (e) {
+        console.warn('Audio graph setup failed:', e);
+        audioSourceConnected = true; // don't retry
+      }
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume().catch(() => {});
+    }
+  }
+
+  function sampleAudio() {
+    if (!analyser || audio.paused || audio.ended) {
+      return { level: 0, bass: 0, treble: 0 };
+    }
+    analyser.getByteTimeDomainData(waveData);
+    analyser.getByteFrequencyData(freqData);
+
+    // Time-domain level
+    let wfSum = 0;
+    for (let i = 0; i < waveData.length; i++) {
+      wfSum += Math.abs((waveData[i] - 128) / 128);
+    }
+    const level = Math.min(1, (wfSum / waveData.length) * 4.0);
+
+    // Frequency-domain bass (low bins) and treble (high bins)
+    const bins = freqData.length;
+    let bass = 0, treble = 0;
+    const bassEnd = Math.max(1, Math.floor(bins * 0.08));
+    const trebleStart = Math.floor(bins * 0.5);
+    for (let i = 0; i < bassEnd; i++) bass += freqData[i];
+    for (let i = trebleStart; i < bins; i++) treble += freqData[i];
+    bass   = (bass   / (bassEnd * 255));
+    treble = (treble / Math.max(1, (bins - trebleStart) * 255));
+
+    return { level, bass, treble };
+  }
+
+  // Animation loop that reads audio and drives the shader uniforms
+  function tweenFluid() {
     requestAnimationFrame(tweenFluid);
-    return;
-  }
+    const isPlaying = audio.src && !audio.paused && !audio.ended;
 
-  const u = prog.uniforms;
-  const isPlaying = audio.src && !audio.paused && !audio.ended;
-
-  if (isPlaying) {
-    const raw = sampleAudioLevel();
-    audioLevel += (raw - audioLevel) * 0.22;
-    // Speaking: slightly brighter, sharper (less glow), thinner strands, gentle motion
-    targetIntensity = 0.48 + audioLevel * 0.10;
-    targetOpacity = 1.0 + audioLevel * 0.06;
-    targetSpeed = 0.26 + audioLevel * 0.10;
-    targetGlow = 1.22 + audioLevel * 0.14;
-    targetSat = 1.18 + audioLevel * 0.12;
-    targetAmplitude = 1.20 + audioLevel * 0.22;
-    targetThickness = 0.36 + audioLevel * 0.10;
-  } else if (generating) {
-    audioLevel *= 0.85;
-    const pulse = 0.5 + 0.5 * Math.sin(Date.now() * 0.005);
-    targetIntensity = 0.44 + pulse * 0.08;
-    targetOpacity = 1.0;
-    targetSpeed = 0.30 + pulse * 0.12;
-    targetGlow = 1.9 + pulse * 0.25;
-    targetSat = 1.2;
-    targetAmplitude = 1.22 + pulse * 0.15;
-    targetThickness = 0.68 + pulse * 0.06;
-  } else {
-    audioLevel *= 0.88;
-    targetIntensity = 0.42;
-    targetOpacity = 1.0;
-    targetSpeed = 0.28;
-    targetGlow = 2.1;
-    targetSat = 1.2;
-    targetAmplitude = 1.25;
-    targetThickness = 0.72;
-  }
-
-  const ease = isPlaying ? 0.10 : 0.08;
-  u.uIntensity.value += (targetIntensity - u.uIntensity.value) * ease;
-  u.uOpacity.value += (targetOpacity - u.uOpacity.value) * ease;
-  u.uSpeed.value += (targetSpeed - u.uSpeed.value) * ease;
-  u.uGlow.value += (targetGlow - u.uGlow.value) * ease;
-  u.uSaturation.value += (targetSat - u.uSaturation.value) * ease;
-  u.uAmplitude.value += (targetAmplitude - u.uAmplitude.value) * ease;
-  u.uThickness.value += (targetThickness - u.uThickness.value) * ease;
-
-  requestAnimationFrame(tweenFluid);
-}
-
-// ─── TTS App Logic ───
-let currentProvider = 'openai';
-let settingsProvider = 'openai';
-let voices = {};
-let selectedVoiceId = '';
-let audioBlobUrl = null;
-let lastGeneratedKey = '';
-let generating = false;
-
-const input = document.getElementById('textInput');
-const playBtn = document.getElementById('play-btn');
-const playIcon = document.getElementById('play-icon');
-const playWrap = document.getElementById('play-wrap');
-const statusDot = document.getElementById('status-dot');
-const statusLabel = document.getElementById('status-label');
-const errorEl = document.getElementById('errorMsg');
-const audio = document.getElementById('audioElement');
-const settingsVoiceSelect = document.getElementById('settings-voice');
-
-function hideError() {
-  errorEl.classList.remove('visible');
-  errorEl.textContent = '';
-}
-
-function showError(msg) {
-  errorEl.textContent = msg;
-  errorEl.classList.add('visible');
-}
-
-function setStatus(mode) {
-  if (mode === 'speaking') {
-    statusDot.style.background = '#ff00aa';
-    statusDot.style.boxShadow = '0 0 8px #ff00aa';
-    statusLabel.textContent = 'Speaking…';
-  } else if (mode === 'generating') {
-    statusDot.style.background = '#ffaa00';
-    statusDot.style.boxShadow = '0 0 8px #ffaa00';
-    statusLabel.textContent = 'Generating…';
-  } else if (mode === 'paused') {
-    statusDot.style.background = '#64748b';
-    statusDot.style.boxShadow = 'none';
-    statusLabel.textContent = 'Paused';
-  } else {
-    statusDot.style.background = '#64748b';
-    statusDot.style.boxShadow = 'none';
-    statusLabel.textContent = 'Ready to read';
-  }
-}
-
-function updatePlayIcon(playing) {
-  playIcon.setAttribute('icon', playing ? 'solar:pause-bold' : 'solar:play-bold');
-}
-
-function generationKey() {
-  return `${currentProvider}:${selectedVoiceId}:${input.value.trim()}`;
-}
-
-async function loadVoices() {
-  try {
-    const resp = await fetch('/api/voices');
-    voices = await resp.json();
-    populateSettingsVoiceSelect();
-  } catch (e) {
-    console.error('Failed to load voices:', e);
-  }
-}
-
-function updateKeyDots(cfg) {
-  const ready = 'inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.6)]';
-  const unset = 'inline-block w-1.5 h-1.5 rounded-full bg-rose-500 shadow-[0_0_6px_rgba(244,63,94,0.5)]';
-  document.getElementById('dot-openai').className = 'ml-1 ' + (cfg.openai_set ? ready : unset);
-  document.getElementById('dot-elevenlabs').className = 'ml-1 ' + (cfg.elevenlabs_set ? ready : unset);
-  document.getElementById('dot-cartesia').className = 'ml-1 ' + (cfg.cartesia_set ? ready : unset);
-}
-
-async function loadConfigStatus() {
-  try {
-    const resp = await fetch('/api/config');
-    const cfg = await resp.json();
-    updateKeyDots(cfg);
-    if (cfg.default_provider) {
-      currentProvider = cfg.default_provider;
-      settingsProvider = cfg.default_provider;
+    if (isPlaying && fluidReactive) {
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
+      }
+      const spec = sampleAudio();
+      window.__fluidSetActive(Math.min(1, spec.level * 2.2));
+      window.__fluidSetBass(spec.bass);
+      window.__fluidSetTreble(spec.treble);
+    } else {
+      window.__fluidSetActive(0);
+      window.__fluidSetBass(0);
+      window.__fluidSetTreble(0);
     }
-    if (cfg.selected_voice) {
-      selectedVoiceId = cfg.selected_voice;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // TTS APP LOGIC
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  function apiPost(url, body) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (window.__DONNA_API_TOKEN) {
+      headers['X-Donna-Token'] = window.__DONNA_API_TOKEN;
     }
+    return fetch(url, { method: 'POST', headers, body: JSON.stringify(body) });
+  }
+
+  let currentProvider = 'local';
+  let settingsProvider = 'local';
+  let voices = {};
+  let selectedVoiceId = '';
+  let audioBlobUrl = null;
+  let lastGeneratedKey = '';
+  let generating = false;
+
+  const input = document.getElementById('textInput');
+  const textBubbleShell = document.getElementById('textBubbleShell');
+  const statusBubbleShell = document.getElementById('statusBubbleShell');
+  const TEXT_BUBBLE_MAX = 320;
+  const BUBBLE_RADIUS_TARGET = 16;
+  let bubbleResizeTimer = null;
+
+  function applyBubbleRadius(shell) {
+    const glass = shell.querySelector('.glass-bubble');
+    if (!glass) return;
+    const h = glass.getBoundingClientRect().height;
+    const halfCap = Math.floor(h / 2) - 1;
+    const scaled = Math.round(h * 0.24);
+    const r = Math.min(BUBBLE_RADIUS_TARGET, halfCap, Math.max(8, scaled));
+    shell.style.setProperty('--bubble-radius-target', `${r}px`);
+  }
+
+  function syncAllBubbleShapes() {
+    applyBubbleRadius(statusBubbleShell);
+    applyBubbleRadius(textBubbleShell);
+  }
+
+  function resizeTextBubble() {
+    const glass = textBubbleShell.querySelector('.glass-bubble');
+    glass.classList.add('is-expanding');
+
+    const start = input.offsetHeight;
+    input.style.height = 'auto';
+    const next = Math.min(input.scrollHeight, TEXT_BUBBLE_MAX);
+    input.style.height = `${start}px`;
+    input.offsetHeight; // reflow
+    input.style.height = `${next}px`;
+    input.style.overflowY = input.scrollHeight > TEXT_BUBBLE_MAX ? 'auto' : 'hidden';
+
+    requestAnimationFrame(syncAllBubbleShapes);
+    clearTimeout(bubbleResizeTimer);
+    bubbleResizeTimer = setTimeout(() => {
+      glass.classList.remove('is-expanding');
+      syncAllBubbleShapes();
+    }, 340);
+  }
+
+  const playBtn = document.getElementById('play-btn');
+  const playIcon = document.getElementById('play-icon');
+  const playWrap = document.getElementById('play-wrap');
+  const statusDot = document.getElementById('status-dot');
+  const statusLabel = document.getElementById('status-label');
+  const errorEl = document.getElementById('errorMsg');
+  const settingsVoiceSelect = document.getElementById('settings-voice');
+
+  function hideError() {
+    errorEl.classList.remove('visible');
+    errorEl.textContent = '';
+  }
+
+  function showError(msg) {
+    errorEl.textContent = msg;
+    errorEl.classList.add('visible');
+  }
+
+  function setStatus(mode) {
+    if (mode === 'speaking') {
+      statusDot.style.background = themeAccent1;
+      statusDot.style.boxShadow = `0 0 8px ${themeAccent1}`;
+      statusLabel.textContent = 'Speaking…';
+    } else if (mode === 'generating') {
+      statusDot.style.background = '#ffaa00';
+      statusDot.style.boxShadow = '0 0 8px #ffaa00';
+      statusLabel.textContent = 'Generating…';
+    } else if (mode === 'paused') {
+      statusDot.style.background = '#64748b';
+      statusDot.style.boxShadow = 'none';
+      statusLabel.textContent = 'Paused';
+    } else {
+      statusDot.style.background = '#64748b';
+      statusDot.style.boxShadow = 'none';
+      statusLabel.textContent = 'Ready to read';
+    }
+  }
+
+  function updatePlayIcon(playing) {
+    playIcon.setAttribute('icon', playing ? 'solar:pause-bold' : 'solar:play-bold');
+  }
+
+  function generationKey() {
+    return `${currentProvider}:${selectedVoiceId}:${input.value.trim()}`;
+  }
+
+  async function loadVoices() {
+    try {
+      const resp = await fetch('/api/voices');
+      voices = await resp.json();
+      populateSettingsVoiceSelect();
+    } catch (e) {
+      console.error('Failed to load voices:', e);
+    }
+  }
+
+  function updateKeyDots(cfg) {
+    const ready = 'inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.6)]';
+    const unset = 'inline-block w-1.5 h-1.5 rounded-full bg-rose-500 shadow-[0_0_6px_rgba(244,63,94,0.5)]';
+    document.getElementById('dot-openai').className = 'ml-1 ' + (cfg.openai_set ? ready : unset);
+    document.getElementById('dot-elevenlabs').className = 'ml-1 ' + (cfg.elevenlabs_set ? ready : unset);
+    document.getElementById('dot-cartesia').className = 'ml-1 ' + (cfg.cartesia_set ? ready : unset);
+  }
+
+  async function loadConfigStatus() {
+    try {
+      const resp = await fetch('/api/config');
+      const cfg = await resp.json();
+      updateKeyDots(cfg);
+      if (cfg.default_provider) {
+        currentProvider = cfg.default_provider;
+        settingsProvider = cfg.default_provider;
+      }
+      if (cfg.selected_voice) {
+        selectedVoiceId = cfg.selected_voice;
+      }
+      if (cfg.fluid_scheme && FLUID_SCHEMES[cfg.fluid_scheme]) {
+        currentFluidScheme = cfg.fluid_scheme;
+        settingsFluidScheme = cfg.fluid_scheme;
+        applyTheme(cfg.fluid_scheme);
+      }
+      fluidReactive = cfg.fluid_reactive !== false;
+      settingsFluidReactive = fluidReactive;
+      syncFluidReactiveUI();
+      syncSettingsProviderUI();
+      populateSettingsVoiceSelect();
+    } catch (e) {
+      console.error('Failed to load config:', e);
+    }
+  }
+
+  function syncSettingsProviderUI() {
+    document.querySelectorAll('.provider-option').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.provider === settingsProvider);
+    });
+  }
+
+  function selectSettingsProvider(provider) {
+    settingsProvider = provider;
     syncSettingsProviderUI();
-    populateSettingsVoiceSelect();
-  } catch (e) {
-    console.error('Failed to load config:', e);
-  }
-}
-
-function syncSettingsProviderUI() {
-  document.querySelectorAll('.provider-option').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.provider === settingsProvider);
-  });
-}
-
-function selectSettingsProvider(provider) {
-  settingsProvider = provider;
-  syncSettingsProviderUI();
-  populateSettingsVoiceSelect(true);
-}
-
-function populateSettingsVoiceSelect(preserveSelection) {
-  const list = voices[settingsProvider] || [];
-  const prev = preserveSelection ? settingsVoiceSelect.value : selectedVoiceId;
-  settingsVoiceSelect.innerHTML = '';
-  if (!list.length) {
-    const opt = document.createElement('option');
-    opt.value = '';
-    opt.textContent = 'No voices — add API key';
-    settingsVoiceSelect.appendChild(opt);
-    return;
-  }
-  list.forEach(v => {
-    const opt = document.createElement('option');
-    opt.value = v.id;
-    opt.textContent = v.name + (v.description ? ` — ${v.description}` : '');
-    settingsVoiceSelect.appendChild(opt);
-  });
-  const match = list.find(v => v.id === prev);
-  if (match) {
-    settingsVoiceSelect.value = match.id;
-  } else {
-    settingsVoiceSelect.value = list[0].id;
-  }
-}
-
-function applyProviderAndVoice() {
-  currentProvider = settingsProvider;
-  selectedVoiceId = settingsVoiceSelect.value;
-  lastGeneratedKey = '';
-}
-
-async function generateAudio() {
-  const text = input.value.trim();
-  if (!text) {
-    showError('Please enter some text first.');
-    return false;
-  }
-  if (!selectedVoiceId) {
-    showError('Choose a voice in Settings.');
-    return false;
+    populateSettingsVoiceSelect(true);
   }
 
-  generating = true;
-  hideError();
-  playBtn.disabled = true;
-  playWrap.classList.add('loading');
-  setStatus('generating');
-
-  try {
-    const resp = await fetch('/api/tts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, provider: currentProvider, voice: selectedVoiceId }),
-    });
-    if (!resp.ok) {
-      const err = await resp.json();
-      throw new Error(err.error || 'TTS request failed');
+  function populateSettingsVoiceSelect(preserveSelection) {
+    const list = voices[settingsProvider] || [];
+    const prev = preserveSelection ? settingsVoiceSelect.value : selectedVoiceId;
+    settingsVoiceSelect.innerHTML = '';
+    if (!list.length) {
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = 'No voices — add API key';
+      settingsVoiceSelect.appendChild(opt);
+      return;
     }
-    const blob = await resp.blob();
-    if (audioBlobUrl) URL.revokeObjectURL(audioBlobUrl);
-    audioBlobUrl = URL.createObjectURL(blob);
-    audio.src = audioBlobUrl;
-    lastGeneratedKey = generationKey();
-    ensureAudioGraph();
-    if (audioCtx?.state === 'suspended') await audioCtx.resume();
-    await audio.play();
-    return true;
-  } catch (e) {
-    showError(e.message);
-    setStatus('idle');
-    return false;
-  } finally {
-    generating = false;
-    playBtn.disabled = false;
-    playWrap.classList.remove('loading');
-  }
-}
-
-async function togglePlay() {
-  hideError();
-  const text = input.value.trim();
-  if (!text) {
-    showError('Please enter some text first.');
-    return;
-  }
-  if (generating) return;
-
-  const needsGenerate = !audio.src || lastGeneratedKey !== generationKey();
-
-  if (needsGenerate) {
-    const ok = await generateAudio();
-    if (!ok) return;
-  } else if (audio.paused) {
-    ensureAudioGraph();
-    if (audioCtx?.state === 'suspended') await audioCtx.resume();
-    await audio.play();
-  } else {
-    audio.pause();
-  }
-}
-
-function skip(seconds) {
-  if (!audio.src) return;
-  audio.currentTime = Math.max(0, Math.min(audio.duration || 0, audio.currentTime + seconds));
-}
-
-function openSettings() {
-  settingsProvider = currentProvider;
-  syncSettingsProviderUI();
-  populateSettingsVoiceSelect(true);
-  if (selectedVoiceId) settingsVoiceSelect.value = selectedVoiceId;
-  document.getElementById('settingsModal').classList.add('visible');
-}
-
-function closeSettings() {
-  document.getElementById('settingsModal').classList.remove('visible');
-}
-
-async function saveSettings() {
-  applyProviderAndVoice();
-  const keys = {
-    openai_api_key: document.getElementById('key-openai').value.trim(),
-    elevenlabs_api_key: document.getElementById('key-elevenlabs').value.trim(),
-    cartesia_api_key: document.getElementById('key-cartesia').value.trim(),
-    default_provider: currentProvider,
-    selected_voice: selectedVoiceId,
-  };
-  try {
-    await fetch('/api/config', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(keys),
+    list.forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v.id;
+      opt.textContent = v.name + (v.description ? ` — ${v.description}` : '');
+      settingsVoiceSelect.appendChild(opt);
     });
-    closeSettings();
+    const match = list.find(v => v.id === prev);
+    if (match) {
+      settingsVoiceSelect.value = match.id;
+    } else {
+      settingsVoiceSelect.value = list[0].id;
+    }
+  }
+
+  function applyProviderAndVoice() {
+    currentProvider = settingsProvider;
+    selectedVoiceId = settingsVoiceSelect.value;
+    lastGeneratedKey = '';
+  }
+
+  async function generateAudio() {
+    const text = input.value.trim();
+    if (!text) {
+      showError('Please enter some text first.');
+      return false;
+    }
+    if (!selectedVoiceId) {
+      showError('Choose a voice in Settings.');
+      return false;
+    }
+
+    generating = true;
+    hideError();
+    playBtn.disabled = true;
+    playWrap.classList.add('loading');
+    setStatus('generating');
+
+    try {
+      const resp = await apiPost('/api/tts', {
+        text, provider: currentProvider, voice: selectedVoiceId,
+      });
+      if (!resp.ok) {
+        const err = await resp.json();
+        throw new Error(err.error || 'TTS request failed');
+      }
+      const blob = await resp.blob();
+      if (audioBlobUrl) URL.revokeObjectURL(audioBlobUrl);
+      audioBlobUrl = URL.createObjectURL(blob);
+      audio.src = audioBlobUrl;
+      lastGeneratedKey = generationKey();
+      ensureAudioGraph();
+      if (audioCtx?.state === 'suspended') await audioCtx.resume();
+      await audio.play();
+      return true;
+    } catch (e) {
+      showError(e.message);
+      setStatus('idle');
+      return false;
+    } finally {
+      generating = false;
+      playBtn.disabled = false;
+      playWrap.classList.remove('loading');
+    }
+  }
+
+  async function togglePlay() {
+    hideError();
+    const text = input.value.trim();
+    if (!text) {
+      showError('Please enter some text first.');
+      return;
+    }
+    if (generating) return;
+
+    const needsGenerate = !audio.src || lastGeneratedKey !== generationKey();
+
+    if (needsGenerate) {
+      const ok = await generateAudio();
+      if (!ok) return;
+    } else if (audio.paused) {
+      ensureAudioGraph();
+      if (audioCtx?.state === 'suspended') await audioCtx.resume();
+      await audio.play();
+    } else {
+      audio.pause();
+    }
+  }
+
+  function skip(seconds) {
+    if (!audio.src) return;
+    audio.currentTime = Math.max(0, Math.min(audio.duration || 0, audio.currentTime + seconds));
+  }
+
+  function syncFluidReactiveUI() {
+    const el = document.getElementById('settings-fluid-reactive');
+    if (el) el.checked = settingsFluidReactive;
+  }
+
+  let settingsModalOpen = false;
+  let settingsTab = 'voices';
+
+  function syncSettingsTabUI() {
+    document.querySelectorAll('.settings-tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === settingsTab);
+    });
+    document.querySelectorAll('.settings-tab-panel').forEach(panel => {
+      panel.classList.toggle('is-active', panel.dataset.tab === settingsTab);
+    });
+  }
+
+  function selectSettingsTab(tab) {
+    if (tab === settingsTab || !['voices', 'theme', 'provider'].includes(tab)) return;
+    settingsTab = tab;
+    syncSettingsTabUI();
+  }
+
+  function openSettings() {
+    if (settingsModalOpen) return;
+    settingsProvider = currentProvider;
+    settingsFluidScheme = currentFluidScheme;
+    settingsFluidReactive = fluidReactive;
+    settingsTab = 'voices';
+    syncSettingsProviderUI();
+    syncSchemeUI();
+    syncFluidReactiveUI();
+    syncSettingsTabUI();
+    populateSettingsVoiceSelect(true);
+    if (selectedVoiceId) settingsVoiceSelect.value = selectedVoiceId;
+
+    const modal = document.getElementById('settingsModal');
+    settingsModalOpen = true;
+    modal.setAttribute('aria-hidden', 'false');
+    requestAnimationFrame(() => modal.classList.add('visible'));
+  }
+
+  function closeSettings() {
+    if (!settingsModalOpen) return;
+    applyTheme(currentFluidScheme);
+    settingsFluidScheme = currentFluidScheme;
+    settingsFluidReactive = fluidReactive;
+    syncFluidReactiveUI();
+
+    const modal = document.getElementById('settingsModal');
+    settingsModalOpen = false;
+    modal.setAttribute('aria-hidden', 'true');
+    modal.classList.remove('visible');
+  }
+
+  async function saveSettings() {
+    applyProviderAndVoice();
+    currentFluidScheme = settingsFluidScheme;
+    settingsFluidReactive = document.getElementById('settings-fluid-reactive').checked;
+    fluidReactive = settingsFluidReactive;
+    const keys = {
+      openai_api_key: document.getElementById('key-openai').value.trim(),
+      elevenlabs_api_key: document.getElementById('key-elevenlabs').value.trim(),
+      cartesia_api_key: document.getElementById('key-cartesia').value.trim(),
+      default_provider: currentProvider,
+      selected_voice: selectedVoiceId,
+      fluid_scheme: currentFluidScheme,
+      fluid_reactive: settingsFluidReactive,
+    };
+    try {
+      await apiPost('/api/config', keys);
+      closeSettings();
+      await Promise.all([loadVoices(), loadConfigStatus()]);
+      applyProviderAndVoice();
+    } catch (e) {
+      showError('Failed to save settings: ' + e.message);
+    }
+  }
+
+  input.addEventListener('input', () => {
+    lastGeneratedKey = '';
+    resizeTextBubble();
+  });
+
+  document.getElementById('clear-btn').addEventListener('click', () => {
+    input.value = '';
+    resizeTextBubble();
+    audio.pause();
+    audio.removeAttribute('src');
+    if (audioBlobUrl) URL.revokeObjectURL(audioBlobUrl);
+    audioBlobUrl = null;
+    lastGeneratedKey = '';
+    setStatus('idle');
+    updatePlayIcon(false);
+  });
+
+  playBtn.addEventListener('click', () => togglePlay());
+  document.getElementById('rewind-btn').addEventListener('click', () => skip(-10));
+  document.getElementById('forward-btn').addEventListener('click', () => skip(10));
+
+  audio.addEventListener('play', () => {
+    setStatus('speaking');
+    updatePlayIcon(true);
+    ensureAudioGraph();
+    if (audioCtx?.state === 'suspended') audioCtx.resume();
+  });
+  audio.addEventListener('pause', () => {
+    if (!generating) {
+      setStatus(audio.currentTime > 0 && audio.currentTime < audio.duration ? 'paused' : 'idle');
+      updatePlayIcon(false);
+    }
+  });
+  audio.addEventListener('ended', () => {
+    setStatus('idle');
+    updatePlayIcon(false);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'f') {
+      if (window.pywebview?.api?.toggle_fullscreen) {
+        e.preventDefault();
+        window.pywebview.api.toggle_fullscreen();
+      }
+    }
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      e.preventDefault();
+      togglePlay();
+    }
+    if (e.code === 'Space' && e.target !== input) {
+      e.preventDefault();
+      togglePlay();
+    }
+  });
+
+  // Expose functions for inline onclick handlers
+  window.selectSettingsProvider = selectSettingsProvider;
+  window.selectSettingsTab = selectSettingsTab;
+  window.openSettings = openSettings;
+  window.closeSettings = closeSettings;
+  window.saveSettings = saveSettings;
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // INIT
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    document.getElementById('settings-fluid-reactive').addEventListener('change', (e) => {
+      settingsFluidReactive = e.target.checked;
+    });
+    tweenFluid();
+    resizeTextBubble();
+    syncAllBubbleShapes();
+    window.addEventListener('resize', syncAllBubbleShapes);
     await Promise.all([loadVoices(), loadConfigStatus()]);
     applyProviderAndVoice();
-  } catch (e) {
-    showError('Failed to save settings: ' + e.message);
-  }
-}
+  });
 
-input.addEventListener('input', () => { lastGeneratedKey = ''; });
-
-document.getElementById('clear-btn').addEventListener('click', () => {
-  input.value = '';
-  audio.pause();
-  audio.removeAttribute('src');
-  if (audioBlobUrl) URL.revokeObjectURL(audioBlobUrl);
-  audioBlobUrl = null;
-  lastGeneratedKey = '';
-  setStatus('idle');
-  updatePlayIcon(false);
-});
-
-playBtn.addEventListener('click', () => togglePlay());
-document.getElementById('rewind-btn').addEventListener('click', () => skip(-10));
-document.getElementById('forward-btn').addEventListener('click', () => skip(10));
-
-audio.addEventListener('play', () => {
-  setStatus('speaking');
-  updatePlayIcon(true);
-  ensureAudioGraph();
-  if (audioCtx?.state === 'suspended') audioCtx.resume();
-});
-audio.addEventListener('pause', () => {
-  if (!generating) {
-    setStatus(audio.currentTime > 0 && audio.currentTime < audio.duration ? 'paused' : 'idle');
-    updatePlayIcon(false);
-  }
-});
-audio.addEventListener('ended', () => {
-  setStatus('idle');
-  updatePlayIcon(false);
-});
-
-document.addEventListener('keydown', (e) => {
-  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-    e.preventDefault();
-    togglePlay();
-  }
-  if (e.code === 'Space' && e.target !== input) {
-    e.preventDefault();
-    togglePlay();
-  }
-});
-
-window.selectSettingsProvider = selectSettingsProvider;
-window.openSettings = openSettings;
-window.closeSettings = closeSettings;
-window.saveSettings = saveSettings;
-
-document.addEventListener('DOMContentLoaded', async () => {
-  initWebGL();
-  tweenFluid();
-  await Promise.all([loadVoices(), loadConfigStatus()]);
-  applyProviderAndVoice();
-});
+})();
 </script>
 </body>
 </html>

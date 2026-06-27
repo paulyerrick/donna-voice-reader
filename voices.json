@@ -1,6 +1,16 @@
 {
   "beta_all_free": false,
   "providers": {
+    "local": {
+      "free": [
+        { "id": "af_heart", "name": "Heart", "description": "Warm, natural female" },
+        { "id": "af_bella", "name": "Bella", "description": "Soft, friendly female" },
+        { "id": "am_adam", "name": "Adam", "description": "Clear, steady male" },
+        { "id": "am_michael", "name": "Michael", "description": "Deep, confident male" },
+        { "id": "bf_emma", "name": "Emma", "description": "British female, expressive" }
+      ],
+      "premium": []
+    },
     "openai": {
       "free": [
         { "id": "alloy", "name": "Alloy", "description": "Balanced, neutral" },

@@ -2,9 +2,16 @@ venv/
 __pycache__/
 *.pyc
 config.json
+.env
+.env.*
+*.pem
+*.key
 build/
 dist/
 release/
 *.spec
 !Donna.spec
 .DS_Store
+venv-kokoro-test/
+assets/kokoro/kokoro-v1_0.pth
+assets/kokoro/voices/*.pt

@@ -1,0 +1,2 @@
+# Optional dev/build tools — not needed to run the app
+higgsfield-client>=0.1
