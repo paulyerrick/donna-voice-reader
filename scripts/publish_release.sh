@@ -27,7 +27,7 @@ NOTES="$(cat <<EOF
 
 1. Download **Donna-Voice-Reader-${VER}-macOS.dmg** (recommended) or the ZIP below.
 2. Open the DMG and drag **Donna** to **Applications**.
-3. First launch: right-click Donna → **Open** → **Open** (unsigned app).
+3. First launch: right-click Donna, choose **Open**, then **Open** again (unsigned app).
 
 ## What's new in ${VER}
 
@@ -38,14 +38,14 @@ NOTES="$(cat <<EOF
 
 ## Requirements
 
-- macOS on Apple Silicon (arm64)
-- ~1.2 GB disk space (includes local TTS model)
+- macOS 13 or later
+- ~700 MB download; ~1.2 GB installed (includes local TTS model)
 - API keys only if you use cloud providers
 
 ## Files
 
-- \`Donna-Voice-Reader-${VER}-macOS.dmg\` — recommended installer
-- \`Donna-Voice-Reader-${VER}-macOS.zip\` — same app bundle, zip format
+- Donna-Voice-Reader-${VER}-macOS.dmg — recommended installer
+- Donna-Voice-Reader-${VER}-macOS.zip — same app bundle, zip format
 EOF
 )"
 

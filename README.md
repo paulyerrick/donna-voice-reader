@@ -39,7 +39,7 @@ The download is ~1.2 GB because it includes the local neural TTS model and runti
 
 ## Requirements
 
-- **macOS** on Apple Silicon (arm64 build)
+- **macOS** 13 or later
 - **Optional:** API keys for cloud providers only
 
 Config is stored at `~/Library/Application Support/Donna/config.json`.
