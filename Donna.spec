@@ -76,7 +76,7 @@ exe = EXE(
     upx=False,
     console=False,
     disable_windowed_traceback=False,
-    argv_emulation=False,
+    argv_emulation=True,
     target_arch=target_arch,
     codesign_identity=None,
     entitlements_file=None,
@@ -96,4 +96,9 @@ app = BUNDLE(
     name='Donna.app',
     icon='assets/Donna.icns',
     bundle_identifier='com.donna.voicereader',
+    info_plist={
+        'NSPrincipalClass': 'NSApplication',
+        'CFBundleShortVersionString': '0.2.0',
+        'CFBundleVersion': '0.2.0',
+    },
 )

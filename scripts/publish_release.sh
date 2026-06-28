@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-VERSION="${1:-v0.1.0}"
+VERSION="${1:-v0.2.0}"
 VER="${VERSION#v}"
 REPO="paulyerrick/donna-voice-reader"
 
@@ -25,19 +25,27 @@ DMG="release/Donna-Voice-Reader-${VER}-macOS.dmg"
 NOTES="$(cat <<EOF
 ## Install
 
-1. Download **Donna-Voice-Reader-${VER}-macOS.dmg** (or the ZIP).
-2. Open the DMG and drag **Donna** to Applications.
+1. Download **Donna-Voice-Reader-${VER}-macOS.dmg** (recommended) or the ZIP below.
+2. Open the DMG and drag **Donna** to **Applications**.
 3. First launch: right-click Donna → **Open** → **Open** (unsigned app).
+
+## What's new in ${VER}
+
+- **Local offline voices** — Kokoro-82M bundled; no API key needed for default playback
+- **Reactive fluid background** — audio-reactive WebGL themes (Donna, Ocean, Sunset, Forest, Mono)
+- **Cloud providers** — optional OpenAI, ElevenLabs, and Cartesia API keys in Settings
+- **Updated app icon** and glass UI polish
 
 ## Requirements
 
-- macOS (Apple Silicon build)
-- API key for OpenAI, ElevenLabs, or Cartesia (Settings in the app)
+- macOS on Apple Silicon (arm64)
+- ~1.2 GB disk space (includes local TTS model)
+- API keys only if you use cloud providers
 
 ## Files
 
-- \`Donna-Voice-Reader-${VER}-macOS.dmg\` — recommended
-- \`Donna-Voice-Reader-${VER}-macOS.zip\` — same app, zip format
+- \`Donna-Voice-Reader-${VER}-macOS.dmg\` — recommended installer
+- \`Donna-Voice-Reader-${VER}-macOS.zip\` — same app bundle, zip format
 EOF
 )"
 

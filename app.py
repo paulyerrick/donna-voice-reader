@@ -35,6 +35,7 @@ def get_config_dir():
     return base
 
 CONFIG_PATH = os.path.join(get_config_dir(), 'config.json')
+TOKEN_PATH = os.path.join(get_config_dir(), '.api_token')
 
 app = Flask(__name__, static_folder=STATIC_FOLDER, static_url_path='')
 
@@ -327,16 +328,6 @@ def start_server():
     time.sleep(0.3)
     app.run(host='127.0.0.1', port=17895, debug=False, use_reloader=False)
 
-def _reset_macos_dock_icon():
-    """Force bundle icon (masked) instead of the unmasked executable embedded icon."""
-    import time
-    time.sleep(0.8)
-    try:
-        import AppKit
-        AppKit.NSApp().setApplicationIconImage_(None)
-    except Exception:
-        pass
-
 
 class DonnaApi:
     """JS bridge for native window actions."""
@@ -348,6 +339,13 @@ class DonnaApi:
 
 
 def main():
+    try:
+        with open(TOKEN_PATH, 'w', encoding='utf-8') as f:
+            f.write(API_TOKEN)
+        os.chmod(TOKEN_PATH, 0o600)
+    except OSError:
+        pass
+
     server_thread = threading.Thread(target=start_server, daemon=True)
     server_thread.start()
 
@@ -362,11 +360,8 @@ def main():
         easy_drag=True,
         js_api=DonnaApi(),
     )
-    if sys.platform == 'darwin':
-        webview.start(_reset_macos_dock_icon)
-    else:
-        icon = ICON_PATH if os.path.isfile(ICON_PATH) else None
-        webview.start(icon=icon)
+    icon = ICON_PATH if os.path.isfile(ICON_PATH) else None
+    webview.start(icon=icon)
     os._exit(0)
 
 if __name__ == '__main__':

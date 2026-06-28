@@ -2,6 +2,7 @@ venv/
 __pycache__/
 *.pyc
 config.json
+.api_token
 .env
 .env.*
 *.pem
@@ -15,3 +16,8 @@ release/
 venv-kokoro-test/
 assets/kokoro/kokoro-v1_0.pth
 assets/kokoro/voices/*.pt
+.cursor/
+spline-3d-integration-skill.zip
+static/liquid-glass/
+static/vendor/
+assets/liquid-glass/
